@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<title>repl.it</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.min.js">
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/addons/p5.sound.js">
+	</script>
+</head>
+
+<body>
+
+	<div class="rangeslider1">
+		<input type="range" min="20" max="100" value="10"
+				class="myslider1" id="sliderRange1">
+        <p>Value: <span id="demo1"></span></p>
+    </div>
+
+    <script src="galaxyManager.js"></script>
+    <script>
+        let fft
+
+        var rangeslider1 = document.getElementById("sliderRange1");
+        var output = document.getElementById("demo1");
+        output.innerHTML = rangeslider1.value;
+        rangeslider1.oninput = function() {
+            output.innerHTML = rangeslider1.value;
+            console.log(rangeslider1.value)
+        }
+
+        let Particle = function (position) {
+            this.position = position
+            this.speed = createVector(0, 1)
+            this.color = [random(0, 255), random(0, 255), random(0, 255)]
+            this.draw = function () {
+                circle(this.position.x, this.position.y, this.diameter)
+                fill(this.color)
+            }
+            this.update = function (energy) {
+                this.diameter = random(5, 7) + energy * rangeslider1.value
+                this.position.y += this.speed.y * energy * (rangeslider1.value/2)
+                if (this.position.y > height) {
+                    this.position.y = 0
+                }
+            }
+        }
+
+        function setup(){
+            createCanvas(windowWidth, windowHeight);
+            noStroke();
+            let mic = new p5.AudioIn()
+            mic.start()
+            fft = new p5.FFT()
+            fft.setInput(mic)
+            positionParticles()
+        }
+        function draw(){
+            background(0, 0, 0)
+            let spectrum = fft.analyze()
+            updateParticles(spectrum)
+        }
+    </script>
+
+  </body>
+</html>
